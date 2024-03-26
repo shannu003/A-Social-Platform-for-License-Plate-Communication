@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>License Plate Detection</title>
+</head>
+<body>
+    <h1>License Plate Detection</h1>
+    <div>
+        <button onclick="openCamera()">Open Camera</button>
+    </div>
+    {% if detected_text %}
+    <div>
+        <h2>Detected Text</h2>
+        <p>{{ detected_text }}</p>
+    </div>
+    {% endif %}
+    <script>
+        function openCamera() {
+            window.location.href = "{% url 'open_camera' %}";
+        }
+    </script>
+</body>
+</html>

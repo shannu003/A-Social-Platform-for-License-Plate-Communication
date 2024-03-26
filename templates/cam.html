@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Capture</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+        #videoFeed {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover; /* Ensure the video fills the entire screen */
+        }
+        #captureButton {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #captureButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <video id="videoFeed" autoplay></video>
+
+    <button id="captureButton">Capture Image</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const video = document.getElementById('videoFeed');
+            const captureButton = document.getElementById('captureButton');
+
+            let stream;
+
+            captureButton.style.display = 'none'; // Hide the capture button initially
+
+            captureButton.addEventListener('click', () => {
+                if (!stream) return; // Ensure the camera stream is available
+
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Convert canvas to image data URL
+                const imageData = canvas.toDataURL('image/png');
+
+                // Create new image element
+                const capturedImage = new Image();
+                capturedImage.src = imageData;
+
+                // Append image to body
+                document.body.appendChild(capturedImage);
+
+                // Stop the camera feed
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            });
+
+            // Start camera feed and show capture button
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: 'environment' } } })
+                .then((mediaStream) => {
+                    video.srcObject = mediaStream;
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        captureButton.style.display = 'block'; // Show the capture button
+                    };
+                })
+                .catch((error) => {
+                    console.error('Error accessing the camera:', error);
+                });
+        });
+    </script>
+</body>
+</html>
